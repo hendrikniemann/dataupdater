@@ -1,14 +1,23 @@
-# typescript-library-template [![GitHub license](https://img.shields.io/github/license/vvo/typescript-library-template?style=flat)](https://github.com/vvo/typescript-library-template/blob/master/LICENSE) [![Tests](https://github.com/vvo/typescript-library-template/workflows/CI/badge.svg)](https://github.com/vvo/typescript-library-template/actions) [![codecov](https://codecov.io/gh/vvo/typescript-library-template/branch/master/graph/badge.svg)](https://codecov.io/gh/vvo/typescript-library-template) ![npm](https://img.shields.io/npm/v/typescript-library-template) [![minizipped size](https://badgen.net/bundlephobia/minzip/typescript-library-template)](https://bundlephobia.com/result?p=typescript-library-template)
+# Dataupdater
 
-<p align="center">
-<small><b>Click below to create a new GitHub repository using this template:</b></small>
-<br/><br/><a href="https://github.com/vvo/typescript-library-template/generate">
-<img src="https://img.shields.io/badge/use%20this-template-blue?logo=github">
-</a>
-</p>
+This is a library that is inspired by [Dataloader](https://github.com/graphql/dataloader). Dataupdater batches and merges updates to the same key in a single object and calls the update function for every key-update pair once.We use Dataupdater to batch the updates to the same entity and run a single SQL query.
 
----
+## Usage
 
-**This TypeScript library template** allows you to easily develop, collaborate on and publish a TypeScript library with all the modern tooling you'd expect from the current TypeScript ecosystem.
+Pretty much like Dataloader, but instead of an array of keys, the batch function gets a single object with the properties `key` and `value`.
 
-This is basically [javascript-library-template](https://github.com/vvo/javascript-library-template) but using [tsdx](https://tsdx.io/) for everything.
+```ts
+const updater = new Dataupdater((update: { a: string; b: string }) => {
+  console.log(update);
+  return update.value;
+});
+
+const a1 = updater.update(1, { a: "a1" });
+const b1 = updater.update(1, { b: "b1" });
+const a2 = updater.update(2, { a: "a2" });
+
+await Promise.all([a1, b1, a2]);
+// logs to console:
+// { key: 1, value: { a: "a1", b: "b1" } }
+// { key: 2, value: { a: "a2" } }
+```
